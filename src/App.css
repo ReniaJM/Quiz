@@ -25,3 +25,8 @@
   background-color: cadetblue;
   transition: 0.6s linear;
 }
+
+.continue {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}

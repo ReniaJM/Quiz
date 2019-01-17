@@ -1,5 +1,8 @@
 import React  from 'react';
 import './App.css';
+import { connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import {Link} from 'react-router-dom'
 
 
 function Hero(){
@@ -13,7 +16,7 @@ function Hero(){
     )
 }
 
-function Turn({author,books, hightlight}){
+function Turn({author,books, hightlight, onAnswerSelected}){
     function heilightColour (hightlight){
         const mapping= {
             'none':'',
@@ -28,23 +31,39 @@ function Turn({author,books, hightlight}){
                 <img src={author.imgUrl} alt="Author" className='authorimage'/>
             </div>
             <div className='col-4'>
-                {books.map((title) => <Book title={title} key={title}/>)}
+                {books.map((title) => <Book title={title} key={title} onClick={onAnswerSelected}/>)}
             </div>
         </div>
     )
 }
+Turn.propTypes = {
+        author: PropTypes.shape ({
+        name:PropTypes.string.isRequired,
+        imgUrl:PropTypes.string.isRequired,
+        books:PropTypes.arrayOf(PropTypes.string).isRequired,
 
-function Book ({title}){
+    }),
+        books:PropTypes.arrayOf(PropTypes.string).isRequired,
+        onAnswerSelected:PropTypes.func.isRequired,
+        hightlight: PropTypes.string.isRequired,
+
+};
+
+function Book ({title, onClick}){
     return (
-        <div className='answer'>
+        <div className='answer' onClick={()=>{onClick(title);}}>
             <h3>{title}</h3>
         </div>
     )
 }
-function Continue(){
+function Continue({show, onContinue}){
     return (
-        <div className='row'>
-
+        <div className='row continue'>
+            { show
+               ? <div className='col-11'>
+                    <button className='btn btn-primary btn-lg float-right'onClick={onContinue}>next </button>
+                </div>
+            :null}
         </div>
     )
 }
@@ -61,16 +80,35 @@ function Footer(){
     )
 }
 
-function AuthorQuiz({turnData, hightlight}) {
+function mapStateToProps(state) {
+    return {
+        turnData:state.turnData,
+        hightlight: state.hightlight
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        onAnswerSelected: (answer) =>{
+            dispatch({type:'ANSWER_SELECTED', answer});
+        },
+        onContinue:() =>{
+            dispatch({type:'CONTINUE'});
+        }
+    }
+}
+
+const AuthorQuiz =connect(mapStateToProps, mapDispatchToProps)(function({turnData, hightlight, onAnswerSelected, onContinue}) {
 
     return (
       <div className='container-fluid'>
         <Hero/>
-        <Turn {...turnData} hightlight={hightlight} />
-        <Continue/>
+        <Turn {...turnData} hightlight={hightlight} onAnswerSelected={onAnswerSelected} />
+        <Continue show={hightlight === 'correct'} onContinue={onContinue}/>
+          <p><Link to= "/add">Add author</Link></p>
         <Footer/>
       </div>
     );
-}
+});
 
 export default AuthorQuiz;

@@ -1,0 +1,11 @@
+.addAuthorForm {
+    width: 80%;
+    margin: 50px 10%;
+}
+.addAuthorForm_input {
+    margin-bottom: 20px;
+}
+
+.addAuthorForm_input >label {
+    display: block;
+}
